@@ -13,7 +13,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import ProductItem from '../components/ProductItem';
 import CustomButton from '../components/CustomButton';
-import { getShoppingList, deleteProduct, clearUserSession } from '../services/storage';
+import { clearUserSession } from '../services/storage';
+import { useProductStore } from '../store/productStore';
 import { calculateTotalCost, formatCurrency } from '../utils/calculations';
 import { useAuth } from '../context/AuthContext';
 
@@ -21,14 +22,15 @@ const HomeScreen = ({ navigation, userSession: propSession, onLogout: propLogout
   const auth = useAuth ? useAuth() : {};
   const userSession = propSession || auth?.userSession;
   const onLogout = propLogout || auth?.signOut;
-  const [products, setProducts] = useState([]);
+  const products = useProductStore((s) => s.products);
+  const loadProductsFromStore = useProductStore((s) => s.loadProducts);
+  const removeProduct = useProductStore((s) => s.removeProduct);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const loadProducts = async () => {
     try {
-      const storedProducts = await getShoppingList();
-      setProducts(storedProducts);
+      await loadProductsFromStore();
     } catch (error) {
       console.error('Error al cargar productos en HomeScreen:', error);
       Alert.alert('Error', 'No se pudieron cargar los productos de la lista.');
@@ -63,8 +65,7 @@ const HomeScreen = ({ navigation, userSession: propSession, onLogout: propLogout
           style: 'destructive',
           onPress: async () => {
             try {
-              const updatedList = await deleteProduct(productId);
-              setProducts(updatedList);
+              await removeProduct(productId);
             } catch (error) {
               Alert.alert('Error', 'No se pudo eliminar el producto.');
             }

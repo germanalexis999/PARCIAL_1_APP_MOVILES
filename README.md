@@ -90,3 +90,26 @@ Para correr las pruebas unitarias automatizadas:
 ```bash
 npm test
 ```
+---
+
+## Parcial 2 – Nuevas funcionalidades
+
+- **Permisos** (`src/services/permissions.js`): se consulta/solicita el permiso antes de cada recurso, manejando *concedido / denegado / pendiente*. Si se rechaza, se muestra un mensaje claro con botón "Abrir ajustes".
+- **Cámara y galería** (`expo-image-picker`): foto del producto, visible en la lista (`ProductItem`).
+- **Ubicación** (`expo-location`): ubicación del comercio (dirección aproximada + coordenadas) asociada al producto.
+- **Contactos** (`expo-contacts`): proveedor elegido desde la agenda del dispositivo.
+- **Calendario** (`expo-calendar`): evento "Comprar: X" (mañana 10:00) vinculado al producto (`calendarEventId`).
+- **Estado global con Zustand** (`src/store/`): `productStore` (load/add/update/remove, persistido en AsyncStorage) y `authStore` (sesión). `HomeScreen`, `CreateProductScreen` y el navegador leen/modifican el estado vía hooks del store.
+- **Testing (Jest)**: ahora 13 tests, incluyendo `productStore.test.js` y `permissions.test.js` (con mocks de los módulos nativos).
+
+Modelo de producto: `{ id, name, category, quantity, price, imageUri, location, contact, calendarEventId }`.
+
+### Ejecutar
+```bash
+npm install
+npx expo start      # escanear QR con Expo Go (Android/iOS)
+npm test            # correr los tests
+```
+> Contactos y calendario requieren dispositivo real (no funcionan en web).
+
+**Video DEMO:** _(pegar enlace de YouTube)_

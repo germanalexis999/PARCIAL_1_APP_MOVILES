@@ -1,9 +1,9 @@
-import { createContext, useContext } from 'react';
+﻿import { useAuthStore } from '../store/authStore';
 
-export const AuthContext = createContext({
-  userSession: null,
-  signIn: () => {},
-  signOut: () => {},
-});
-
-export const useAuth = () => useContext(AuthContext);
+// Compatibilidad: el contexto fue reemplazado por el store global (Zustand).
+export const useAuth = () => {
+  const userSession = useAuthStore((s) => s.userSession);
+  const signIn = useAuthStore((s) => s.signIn);
+  const signOut = useAuthStore((s) => s.signOut);
+  return { userSession, signIn, signOut };
+};

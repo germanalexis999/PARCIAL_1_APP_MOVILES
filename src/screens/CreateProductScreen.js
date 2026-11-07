@@ -10,9 +10,11 @@ import {
   ScrollView,
   TouchableOpacity,
   Switch,
+  Image,
 } from 'react-native';
 import CustomButton from '../components/CustomButton';
-import { addProduct } from '../services/storage';
+import { useProductStore } from '../store/productStore';
+import { takePhoto, pickFromGallery, getCurrentLocation, pickContact, createPurchaseEvent } from '../services/device';
 import { schedulePurchaseReminder } from '../services/notifications';
 import { validateProduct } from '../utils/calculations';
 
@@ -36,6 +38,20 @@ const CreateProductScreen = ({ navigation }) => {
   const [reminderSeconds, setReminderSeconds] = useState(5);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const addProduct = useProductStore((s) => s.addProduct);
+  const [imageUri, setImageUri] = useState(null);
+  const [location, setLocation] = useState(null);
+  const [contact, setContact] = useState(null);
+  const [addToCalendar, setAddToCalendar] = useState(false);
+
+  const run = async (fn, setter) => {
+    try {
+      const value = await fn();
+      if (value) setter(value);
+    } catch (e) {
+      Alert.alert('Error', 'No se pudo completar la acción: ' + e.message);
+    }
+  };
 
   const handleSaveProduct = async () => {
     setErrorMessage('');
@@ -52,11 +68,24 @@ const CreateProductScreen = ({ navigation }) => {
       const parsedQty = parseFloat(quantity);
       const parsedPrice = parseFloat(price);
 
+      let calendarEventId = null;
+      if (addToCalendar) {
+        try {
+          calendarEventId = await createPurchaseEvent(name.trim());
+        } catch (calErr) {
+          Alert.alert('Calendario', 'No se pudo crear el evento: ' + calErr.message);
+        }
+      }
+
       await addProduct({
         name: name.trim(),
         category: category.trim(),
         quantity: parsedQty,
         price: parsedPrice,
+        imageUri,
+        location,
+        contact,
+        calendarEventId,
       });
 
       let reminderMsg = '';
@@ -177,6 +206,46 @@ const CreateProductScreen = ({ navigation }) => {
             </View>
           </View>
 
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Foto del producto</Text>
+            {imageUri ? <Image source={{ uri: imageUri }} style={styles.preview} testID="product-image-preview" /> : null}
+            <View style={styles.row}>
+              <CustomButton title="Cámara" variant="outline" onPress={() => run(takePhoto, setImageUri)} style={styles.flexHalf} testID="camera-button" />
+              <View style={{ width: 8 }} />
+              <CustomButton title="Galería" variant="outline" onPress={() => run(pickFromGallery, setImageUri)} style={styles.flexHalf} testID="gallery-button" />
+            </View>
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Comercio (ubicación)</Text>
+            {location ? (
+              <Text style={styles.infoText} testID="location-text">
+                {location.address ? location.address + ' · ' : ''}
+                {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}
+              </Text>
+            ) : null}
+            <CustomButton title="Usar mi ubicación actual" variant="outline" onPress={() => run(getCurrentLocation, setLocation)} testID="location-button" />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Proveedor (contacto)</Text>
+            {contact ? (
+              <Text style={styles.infoText} testID="contact-text">
+                {contact.name}{contact.phone ? ' · ' + contact.phone : ''}
+              </Text>
+            ) : null}
+            <CustomButton title="Elegir contacto" variant="outline" onPress={() => run(pickContact, setContact)} testID="contact-button" />
+          </View>
+
+          <View style={styles.reminderCard}>
+            <View style={styles.reminderHeader}>
+              <View style={styles.reminderInfo}>
+                <Text style={styles.reminderTitle}>Agregar al calendario</Text>
+                <Text style={styles.reminderSubtitle}>Evento "Comprar" mañana a las 10:00</Text>
+              </View>
+              <Switch value={addToCalendar} onValueChange={setAddToCalendar} testID="calendar-switch" />
+            </View>
+          </View>
           <View style={styles.reminderCard}>
             <View style={styles.reminderHeader}>
               <View style={styles.reminderInfo}>
@@ -341,6 +410,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#3B82F6',
   },
+  preview: { width: '100%', height: 180, borderRadius: 12, marginBottom: 8 },
+  infoText: { fontSize: 13, color: '#475569', marginBottom: 6 },
   saveButton: {
     marginTop: 4,
     backgroundColor: '#059669',

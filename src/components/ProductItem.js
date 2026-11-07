@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { formatCurrency } from '../utils/calculations';
 
 const CATEGORY_COLORS = {
@@ -16,7 +16,7 @@ const CATEGORY_COLORS = {
 const ProductItem = ({ product, onDelete }) => {
   if (!product) return null;
 
-  const { id, name, category, quantity, price } = product;
+  const { id, name, category, quantity, price, imageUri, location, contact, calendarEventId } = product;
   const numQty = parseFloat(quantity) || 0;
   const numPrice = parseFloat(price) || 0;
   const subtotal = numQty * numPrice;
@@ -57,6 +57,14 @@ const ProductItem = ({ product, onDelete }) => {
           </View>
         </View>
 
+        {imageUri ? <Image source={{ uri: imageUri }} style={styles.thumb} testID="product-image" /> : null}
+        {location ? (
+          <Text style={styles.extraText} testID="product-location">
+            📍 {location.address || `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`}
+          </Text>
+        ) : null}
+        {contact ? <Text style={styles.extraText} testID="product-contact">👤 {contact.name}</Text> : null}
+        {calendarEventId ? <Text style={styles.extraText} testID="product-calendar">📅 Evento en calendario</Text> : null}
         <View style={styles.footerRow}>
           <TouchableOpacity
             testID="delete-button"
@@ -163,6 +171,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#2563EB',
   },
+  thumb: { width: '100%', height: 140, borderRadius: 10, marginTop: 8 },
+  extraText: { fontSize: 13, color: '#475569', marginTop: 6 },
   footerRow: {
     flexDirection: 'row',
     justifyContent: 'flex-end',

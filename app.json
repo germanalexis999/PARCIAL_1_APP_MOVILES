@@ -1,24 +1,60 @@
-{
-  "expo": {
-    "name": "PARCIAL_APP_MOVIL",
-    "slug": "PARCIAL_APP_MOVIL",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
-      }
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
-  }
+﻿{
+    "expo":  {
+                 "name":  "PARCIAL_APP_MOVIL",
+                 "slug":  "PARCIAL_APP_MOVIL",
+                 "version":  "1.0.0",
+                 "orientation":  "portrait",
+                 "icon":  "./assets/icon.png",
+                 "userInterfaceStyle":  "light",
+                 "ios":  {
+                             "supportsTablet":  true
+                         },
+                 "android":  {
+                                 "adaptiveIcon":  {
+                                                      "backgroundColor":  "#E6F4FE",
+                                                      "foregroundImage":  "./assets/android-icon-foreground.png",
+                                                      "backgroundImage":  "./assets/android-icon-background.png",
+                                                      "monochromeImage":  "./assets/android-icon-monochrome.png"
+                                                  },
+                                 "permissions":  [
+                                                     "CAMERA",
+                                                     "ACCESS_FINE_LOCATION",
+                                                     "ACCESS_COARSE_LOCATION",
+                                                     "READ_CONTACTS",
+                                                     "READ_CALENDAR",
+                                                     "WRITE_CALENDAR"
+                                                 ]
+                             },
+                 "web":  {
+                             "favicon":  "./assets/favicon.png"
+                         },
+                 "plugins":  [
+                                 [
+                                     "expo-image-picker",
+                                     {
+                                         "cameraPermission":  "Permitir acceso a la cámara para fotografiar productos",
+                                         "photosPermission":  "Permitir acceso a la galería para elegir fotos de productos"
+                                     }
+                                 ],
+                                 [
+                                     "expo-location",
+                                     {
+                                         "locationWhenInUsePermission":  "Permitir ubicación para registrar el comercio"
+                                     }
+                                 ],
+                                 [
+                                     "expo-contacts",
+                                     {
+                                         "contactsPermission":  "Permitir acceso a contactos para elegir un proveedor"
+                                     }
+                                 ],
+                                 [
+                                     "expo-calendar",
+                                     {
+                                         "remindersPermission":  "Permitir acceso a recordatorios",
+                                         "calendarPermission":  "Permitir acceso al calendario para crear recordatorios de compra"
+                                     }
+                                 ]
+                             ]
+             }
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -7,54 +7,21 @@ import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import HomeScreen from '../screens/HomeScreen';
 import CreateProductScreen from '../screens/CreateProductScreen';
-import { getUserSession } from '../services/storage';
+import { useAuthStore } from '../store/authStore';
 
-import { AuthContext, useAuth } from '../context/AuthContext';
-export { AuthContext, useAuth };
+import { useAuth } from '../context/AuthContext';
+export { useAuth };
 
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
-  const [userSession, setUserSession] = useState(null);
-  const [loadingSession, setLoadingSession] = useState(true);
+  const userSession = useAuthStore((s) => s.userSession);
+  const loadingSession = useAuthStore((s) => s.loadingSession);
+  const restoreSession = useAuthStore((s) => s.restoreSession);
 
   useEffect(() => {
-    let isMounted = true;
-    const checkInitialSession = async () => {
-      try {
-        const session = await getUserSession();
-        if (isMounted) {
-          setUserSession(session);
-        }
-      } catch (error) {
-        console.error('Error al inicializar sesión:', error);
-      } finally {
-        if (isMounted) {
-          setLoadingSession(false);
-        }
-      }
-    };
-
-    checkInitialSession();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const handleLoginSuccess = (sessionData) => {
-    setUserSession(sessionData);
-  };
-
-  const handleLogout = () => {
-    setUserSession(null);
-  };
-
-  const authValue = {
-    userSession,
-    signIn: handleLoginSuccess,
-    signOut: handleLogout,
-  };
-
+    restoreSession();
+  }, [restoreSession]);
   if (loadingSession) {
     return (
       <View style={styles.loadingContainer}>
@@ -64,7 +31,7 @@ const AppNavigator = () => {
   }
 
   return (
-    <AuthContext.Provider value={authValue}>
+    <>
       <NavigationContainer>
         <Stack.Navigator
           screenOptions={{
@@ -117,7 +84,7 @@ const AppNavigator = () => {
           )}
         </Stack.Navigator>
       </NavigationContainer>
-    </AuthContext.Provider>
+    </>
   );
 };
 
