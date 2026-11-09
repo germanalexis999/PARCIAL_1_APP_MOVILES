@@ -17,7 +17,7 @@ Aplicación móvil desarrollada en **React Native** y **Expo** para la gestión 
    - **Cierre de sesión**: Remueve `@user_session` y redirige al flujo de autenticación (`LoginScreen`).
 
 2. **Gestión de Productos y Presupuesto**
-   - **Entidad**: `{ id, name, category, quantity, price }`.
+   - **Entidad**: `{ id, name, category, quantity, price, imageUri, location, contact, calendarEventId }`.
    - **Alta de productos (`CreateProductScreen`)**: Formulario con validaciones numéricas y selección por categorías (Verdulería, Almacén, Carnicería, Lácteos, etc.).
    - **Listado interactivo (`HomeScreen`)**: Muestra los productos mediante `FlatList` utilizando el componente reutilizable `ProductItem`.
    - **Cálculo en tiempo real**: Suma el producto `cantidad * precio` de cada elemento y muestra el costo total estimado de la compra.
@@ -29,7 +29,7 @@ Aplicación móvil desarrollada en **React Native** y **Expo** para la gestión 
      > *"¡Recordatorio de compra! No olvides comprar: [Nombre del producto]"*
 
 4. **Testing Automatizado con Jest y React Native Testing Library**
-   - Pruebas unitarias y de integración ejecutables con `npm test`:
+   - Pruebas ejecutables con `npm test` (incluye `productStore.test.js` y `permissions.test.js`):
      - `calculations.test.js`: Verifica el cálculo del costo total acumulado.
      - `CustomButton.test.js`: Verifica el renderizado de texto y eventos de pulsación.
      - `ProductItem.test.js`: Verifica el renderizado de datos y la invocación de `onDelete`.
@@ -58,6 +58,7 @@ Aplicación móvil desarrollada en **React Native** y **Expo** para la gestión 
     │   ├── RegisterScreen.js     # Pantalla de registro de usuario
     │   ├── HomeScreen.js         # Lista principal y resumen de total
     │   └── CreateProductScreen.js# Formulario con recordatorio
+    ├── store/                    # Zustand: productStore, authStore
     ├── services/
     │   ├── notifications.js      # Configuración de expo-notifications
     │   └── storage.js            # Abstracción de AsyncStorage
