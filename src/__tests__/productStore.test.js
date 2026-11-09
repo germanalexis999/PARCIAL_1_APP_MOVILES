@@ -1,4 +1,4 @@
-﻿import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useProductStore } from '../store/productStore';
 
 describe('productStore (Zustand)', () => {

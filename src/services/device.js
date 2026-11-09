@@ -1,4 +1,4 @@
-﻿import * as ImagePicker from 'expo-image-picker';
+import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import * as Contacts from 'expo-contacts';
 import * as Calendar from 'expo-calendar';
@@ -37,7 +37,6 @@ export const getCurrentLocation = async () => {
     const [a] = await Location.reverseGeocodeAsync({ latitude, longitude });
     if (a) address = [a.street, a.streetNumber, a.city].filter(Boolean).join(' ');
   } catch (e) {
-    // dirección aproximada opcional
   }
   return { latitude, longitude, address };
 };
