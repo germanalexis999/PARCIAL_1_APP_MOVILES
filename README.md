@@ -1,73 +1,82 @@
 # Lista de Compras Inteligente - App Móvil
 
-Aplicación móvil desarrollada en **React Native** y **Expo** para la gestión inteligente de listas de compras y cálculo de presupuestos.
+Aplicación móvil desarrollada en **React Native** y **Expo** para la gestión inteligente de listas de compras y cálculo de presupuestos (Parcial 1 y Parcial 2 – Aplicaciones Móviles).
 
 ---
 
 ## Características Principales
 
-1. **Autenticación Local Segura (AsyncStorage)**
-   - **Usuario registrado predeterminado**:
-     - **Usuario:** `garce`
-     - **Contraseña:** `123456`
-   - **Registro de nuevos usuarios**: Permite registrar credenciales adicionales o nuevas en el dispositivo bajo `@registered_user`.
-   - **Inicio de sesión**: Valida las credenciales ingresadas contra el usuario registrado y almacena la sesión activa en `@user_session`.
-   - **Campos limpios y sin autocompletado**: Los formularios de login inician en blanco y cuentan con protección contra autocompletado (`autoComplete="off"`, `textContentType="none"`, `importantForAutofill="no"`) para evitar que el navegador o sistema operativo rellene datos automáticamente.
-   - **Persistencia de sesión**: Si el usuario ya inició sesión, ingresa directamente a `HomeScreen`.
-   - **Cierre de sesión**: Remueve `@user_session` y redirige al flujo de autenticación (`LoginScreen`).
+### 1. Autenticación Local y Estado Global (`Zustand`)
+- **Usuario predeterminado:** `garce` / **Contraseña:** `123456`.
+- **Registro e inicio de sesión:** Valida credenciales contra `@registered_user` y persiste la sesión activa en `@user_session` (`AsyncStorage`), con campos protegidos contra autocompletado.
+- **Estado global (`src/store/`):**
+  - `authStore.js`: gestiona `userSession`, `loadingSession`, `signIn`, `signOut`, `restoreSession` y `logout`.
+  - `productStore.js`: gestiona `products`, `loading`, `loadProducts`, `addProduct`, `updateProduct` y `removeProduct`, sincronizando con `AsyncStorage`.
+  - Las pantallas (`HomeScreen`, `CreateProductScreen`) y `AppNavigator` leen y modifican el estado mediante hooks/selectores de Zustand.
 
-2. **Gestión de Productos y Presupuesto**
-   - **Entidad**: `{ id, name, category, quantity, price, imageUri, location, contact, calendarEventId }`.
-   - **Alta de productos (`CreateProductScreen`)**: Formulario con validaciones numéricas y selección por categorías (Verdulería, Almacén, Carnicería, Lácteos, etc.).
-   - **Listado interactivo (`HomeScreen`)**: Muestra los productos mediante `FlatList` utilizando el componente reutilizable `ProductItem`.
-   - **Cálculo en tiempo real**: Suma el producto `cantidad * precio` de cada elemento y muestra el costo total estimado de la compra.
-   - **Eliminación y persistencia**: Botón de eliminación por producto que actualiza la lista y persiste en `@shopping_list`.
+### 2. Gestión de Productos y Presupuesto
+- **Entidad:** `{ id, name, category, quantity, price, imageUri, location, contact, calendarEventId }`.
+- **Alta de productos (`CreateProductScreen`):** Formulario con validaciones numéricas, selección por categorías y cálculo en tiempo real del total estimado en `HomeScreen`.
+- **Listado y eliminación (`ProductItem`):** Tarjetas con foto, ubicación, proveedor, evento vinculado y botón para eliminar productos.
 
-3. **Notificaciones Locales (`expo-notifications`)**
-   - Solicitud de permisos en el inicio de sesión.
-   - Programación de notificación diferida a 5 segundos al agregar un producto:
-     > *"¡Recordatorio de compra! No olvides comprar: [Nombre del producto]"*
+### 3. Permisos y Recursos del Dispositivo
+- **Gestión centralizada de permisos (`src/services/permissions.js`):** Consulta y solicita el permiso correspondiente antes de usar cada recurso, manejando estados *concedido*, *denegado* y *pendiente*. Si el usuario rechaza un permiso, muestra una alerta clara con opción directa para **Abrir ajustes** (`Linking.openSettings()`).
+- **Cámara y Galería (`expo-image-picker`):** Permite tomar una foto con la cámara o elegir una imagen de la galería para asociarla al producto y mostrarla en la lista.
+- **Ubicación GPS (`expo-location`):** Obtiene las coordenadas actuales y dirección aproximada (`reverseGeocodeAsync`) del comercio donde comprar el producto.
+- **Contactos (`expo-contacts`):** Permite seleccionar un contacto de la agenda del dispositivo como proveedor del producto.
+- **Calendario (`expo-calendar`):** Crea un evento de compra (`"Comprar: <producto>"` para el día siguiente a las 10:00 hs) en el calendario del dispositivo y guarda el `calendarEventId` en el producto.
+- **Notificaciones Locales (`expo-notifications`):** Solicita permiso en el login y programa un recordatorio local diferido al guardar un producto.
 
-4. **Testing Automatizado con Jest y React Native Testing Library**
-   - Pruebas ejecutables con `npm test` (incluye `productStore.test.js` y `permissions.test.js`):
-     - `calculations.test.js`: Verifica el cálculo del costo total acumulado.
-     - `CustomButton.test.js`: Verifica el renderizado de texto y eventos de pulsación.
-     - `ProductItem.test.js`: Verifica el renderizado de datos y la invocación de `onDelete`.
+> **Nota:** Algunas integraciones nativas (como Contactos y Calendario) requieren probarse en un dispositivo físico o emulador nativo; no funcionan en la versión Web.
+
+### 4. Testing Automatizado (`Jest` + React Native Testing Library)
+- **5 suites / 13 tests ejecutables con `npm test`** (con mocks de módulos nativos en `jest.setup.js`):
+  - `calculations.test.js`: cálculo del costo total y validaciones.
+  - `CustomButton.test.js`: renderizado y eventos de pulsación.
+  - `ProductItem.test.js`: renderizado de datos del producto e invocación de `onDelete`.
+  - `productStore.test.js`: altas, actualizaciones y bajas en el store de Zustand.
+  - `permissions.test.js`: manejo de estados concedido, denegado y pendiente con alertas.
 
 ---
 
 ## Estructura del Proyecto
 
-```
+```text
 /
 ├── App.js
-├── app.json
+├── app.json                        # Permisos y plugins de Expo
 ├── package.json
 ├── jest.config.js
-├── jest.setup.js
+├── jest.setup.js                   # Mocks de AsyncStorage y módulos de Expo
 └── src/
     ├── components/
-    │   ├── CustomButton.js       # Componente reutilizable de botón estilizado
-    │   └── ProductItem.js        # Tarjeta reutilizable de producto
+    │   ├── CustomButton.js         # Botón reutilizable
+    │   └── ProductItem.js          # Tarjeta de producto (con foto, GPS, contacto y calendario)
     ├── context/
-    │   └── AuthContext.js        # Contexto de autenticación desacoplado
+    │   └── AuthContext.js          # Hook adaptador conectado a authStore
     ├── navigation/
-    │   └── AppNavigator.js       # React Navigation Native Stack condicional
+    │   └── AppNavigator.js         # Stack condicional conectado a authStore
     ├── screens/
-    │   ├── LoginScreen.js        # Pantalla de inicio de sesión
-    │   ├── RegisterScreen.js     # Pantalla de registro de usuario
-    │   ├── HomeScreen.js         # Lista principal y resumen de total
-    │   └── CreateProductScreen.js# Formulario con recordatorio
-    ├── store/                    # Zustand: productStore, authStore
+    │   ├── LoginScreen.js          # Inicio de sesión
+    │   ├── RegisterScreen.js       # Registro de usuario
+    │   ├── HomeScreen.js           # Lista principal y presupuesto total
+    │   └── CreateProductScreen.js  # Alta con cámara, galería, GPS, contacto y calendario
     ├── services/
-    │   ├── notifications.js      # Configuración de expo-notifications
-    │   └── storage.js            # Abstracción de AsyncStorage
+    │   ├── permissions.js          # Solicitud y manejo de permisos del dispositivo
+    │   ├── device.js               # Cámara, galería, ubicación, contactos y calendario
+    │   ├── notifications.js        # Notificaciones locales con expo-notifications
+    │   └── storage.js              # Persistencia en AsyncStorage
+    ├── store/
+    │   ├── authStore.js            # Estado global de sesión (Zustand)
+    │   └── productStore.js         # Estado global de productos (Zustand)
     ├── utils/
-    │   └── calculations.js       # Lógica matemática y validaciones
+    │   └── calculations.js         # Cálculos y validaciones
     └── __tests__/
-        ├── calculations.test.js  # Pruebas de lógica de cálculo
-        ├── CustomButton.test.js  # Pruebas del botón reutilizable
-        └── ProductItem.test.js   # Pruebas de interacción del ítem de producto
+        ├── calculations.test.js
+        ├── CustomButton.test.js
+        ├── ProductItem.test.js
+        ├── productStore.test.js
+        └── permissions.test.js
 ```
 
 ---
@@ -76,41 +85,21 @@ Aplicación móvil desarrollada en **React Native** y **Expo** para la gestión 
 
 ### Requisitos Previos
 - Node.js instalado (v18+)
-- Aplicación **Expo Go** instalada en tu dispositivo móvil (Android / iOS) o emulador configurado.
+- App **Expo Go** instalada en Android / iOS (o emulador configurado)
 
-### 1. Iniciar la App
+### 1. Instalar dependencias e iniciar Expo
 ```bash
-npm start
-# O con Expo CLI:
+npm install
 npx expo start
 ```
-Escanea el código QR desde la app móvil **Expo Go** para abrir la aplicación.
+Escanea el código QR desde **Expo Go** para abrir la aplicación en tu dispositivo.
 
 ### 2. Ejecutar los Tests
-Para correr las pruebas unitarias automatizadas:
 ```bash
 npm test
 ```
+
 ---
 
-## Parcial 2 – Nuevas funcionalidades
-
-- **Permisos** (`src/services/permissions.js`): se consulta/solicita el permiso antes de cada recurso, manejando *concedido / denegado / pendiente*. Si se rechaza, se muestra un mensaje claro con botón "Abrir ajustes".
-- **Cámara y galería** (`expo-image-picker`): foto del producto, visible en la lista (`ProductItem`).
-- **Ubicación** (`expo-location`): ubicación del comercio (dirección aproximada + coordenadas) asociada al producto.
-- **Contactos** (`expo-contacts`): proveedor elegido desde la agenda del dispositivo.
-- **Calendario** (`expo-calendar`): evento "Comprar: X" (mañana 10:00) vinculado al producto (`calendarEventId`).
-- **Estado global con Zustand** (`src/store/`): `productStore` (load/add/update/remove, persistido en AsyncStorage) y `authStore` (sesión). `HomeScreen`, `CreateProductScreen` y el navegador leen/modifican el estado vía hooks del store.
-- **Testing (Jest)**: ahora 13 tests, incluyendo `productStore.test.js` y `permissions.test.js` (con mocks de los módulos nativos).
-
-Modelo de producto: `{ id, name, category, quantity, price, imageUri, location, contact, calendarEventId }`.
-
-### Ejecutar
-```bash
-npm install
-npx expo start      # escanear QR con Expo Go (Android/iOS)
-npm test            # correr los tests
-```
-> Contactos y calendario requieren dispositivo real (no funcionan en web).
-
-**Video DEMO:** _(pegar enlace de YouTube)_
+## Video DEMO
+- **YouTube (máx. 1 minuto):** _(pegar enlace de YouTube aquí)_
