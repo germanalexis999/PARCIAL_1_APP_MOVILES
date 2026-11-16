@@ -410,8 +410,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#3B82F6',
   },
-  preview: { width: '100%', height: 180, borderRadius: 12, marginBottom: 8 },
-  infoText: { fontSize: 13, color: '#475569', marginBottom: 6 },
+  preview: {
+    width: '100%',
+    height: 180,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  infoText: {
+    fontSize: 13,
+    color: '#475569',
+    marginBottom: 6,
+  },
   saveButton: {
     marginTop: 4,
     backgroundColor: '#059669',

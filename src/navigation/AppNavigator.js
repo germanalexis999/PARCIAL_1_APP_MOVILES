@@ -9,9 +9,6 @@ import HomeScreen from '../screens/HomeScreen';
 import CreateProductScreen from '../screens/CreateProductScreen';
 import { useAuthStore } from '../store/authStore';
 
-import { useAuth } from '../context/AuthContext';
-export { useAuth };
-
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -31,60 +28,58 @@ const AppNavigator = () => {
   }
 
   return (
-    <>
-      <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{
-            headerStyle: {
-              backgroundColor: '#F8FAFC',
-            },
-            headerTintColor: '#0F172A',
-            headerTitleStyle: {
-              fontWeight: '700',
-              fontSize: 18,
-            },
-            headerShadowVisible: false,
-            contentStyle: { backgroundColor: '#F8FAFC' },
-          }}
-        >
-          {userSession ? (
-            <>
-              <Stack.Screen
-                name="Home"
-                component={HomeScreen}
-                options={{ headerShown: false }}
-              />
+    <NavigationContainer>
+      <Stack.Navigator
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: '#F8FAFC',
+          },
+          headerTintColor: '#0F172A',
+          headerTitleStyle: {
+            fontWeight: '700',
+            fontSize: 18,
+          },
+          headerShadowVisible: false,
+          contentStyle: { backgroundColor: '#F8FAFC' },
+        }}
+      >
+        {userSession ? (
+          <>
+            <Stack.Screen
+              name="Home"
+              component={HomeScreen}
+              options={{ headerShown: false }}
+            />
 
-              <Stack.Screen
-                name="CreateProduct"
-                component={CreateProductScreen}
-                options={{
-                  title: 'Agregar Producto',
-                  headerBackTitle: 'Volver',
-                }}
-              />
-            </>
-          ) : (
-            <>
-              <Stack.Screen
-                name="Login"
-                component={LoginScreen}
-                options={{ headerShown: false }}
-              />
+            <Stack.Screen
+              name="CreateProduct"
+              component={CreateProductScreen}
+              options={{
+                title: 'Agregar Producto',
+                headerBackTitle: 'Volver',
+              }}
+            />
+          </>
+        ) : (
+          <>
+            <Stack.Screen
+              name="Login"
+              component={LoginScreen}
+              options={{ headerShown: false }}
+            />
 
-              <Stack.Screen
-                name="Register"
-                component={RegisterScreen}
-                options={{
-                  title: 'Registro de Usuario',
-                  headerBackTitle: 'Login',
-                }}
-              />
-            </>
-          )}
-        </Stack.Navigator>
-      </NavigationContainer>
-    </>
+            <Stack.Screen
+              name="Register"
+              component={RegisterScreen}
+              options={{
+                title: 'Registro de Usuario',
+                headerBackTitle: 'Login',
+              }}
+            />
+          </>
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 

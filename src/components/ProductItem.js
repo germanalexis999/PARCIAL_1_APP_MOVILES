@@ -171,8 +171,17 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#2563EB',
   },
-  thumb: { width: '100%', height: 140, borderRadius: 10, marginTop: 8 },
-  extraText: { fontSize: 13, color: '#475569', marginTop: 6 },
+  thumb: {
+    width: '100%',
+    height: 140,
+    borderRadius: 10,
+    marginTop: 8,
+  },
+  extraText: {
+    fontSize: 13,
+    color: '#475569',
+    marginTop: 6,
+  },
   footerRow: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
