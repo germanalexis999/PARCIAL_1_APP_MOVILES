@@ -32,13 +32,23 @@ jest.mock('expo-location', () => ({
 jest.mock('expo-contacts', () => ({
   getPermissionsAsync: jest.fn(() => Promise.resolve({ status: 'granted', granted: true })),
   requestPermissionsAsync: jest.fn(() => Promise.resolve({ status: 'granted', granted: true })),
-  presentContactPickerAsync: jest.fn(() => Promise.resolve({ id: '1', name: 'Juan Perez', phoneNumbers: [{ number: '1122334455' }] })),
+  Contact: {
+    presentPicker: jest.fn(() =>
+      Promise.resolve({
+        id: '1',
+        getFullName: jest.fn(() => Promise.resolve('Juan Perez')),
+        getPhones: jest.fn(() => Promise.resolve([{ number: '1122334455' }])),
+      })
+    ),
+  },
 }));
-jest.mock('expo-calendar', () => ({
+const mockCalendar = {
   getCalendarPermissionsAsync: jest.fn(() => Promise.resolve({ status: 'granted', granted: true })),
   requestCalendarPermissionsAsync: jest.fn(() => Promise.resolve({ status: 'granted', granted: true })),
   getDefaultCalendarAsync: jest.fn(() => Promise.resolve({ id: 'cal1' })),
   getCalendarsAsync: jest.fn(() => Promise.resolve([{ id: 'cal1', allowsModifications: true }])),
   createEventAsync: jest.fn(() => Promise.resolve('event-1')),
   EntityTypes: { EVENT: 'event' },
-}));
+};
+jest.mock('expo-calendar', () => mockCalendar);
+jest.mock('expo-calendar/legacy', () => mockCalendar);

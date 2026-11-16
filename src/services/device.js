@@ -1,7 +1,7 @@
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import * as Contacts from 'expo-contacts';
-import * as Calendar from 'expo-calendar';
+import * as Calendar from 'expo-calendar/legacy';
 import { Platform } from 'react-native';
 import {
   ensureCameraPermission,
@@ -43,12 +43,19 @@ export const getCurrentLocation = async () => {
 
 export const pickContact = async () => {
   if (!(await ensureContactsPermission())) return null;
-  const c = await Contacts.presentContactPickerAsync();
-  if (!c) return null;
+  const contact = await Contacts.Contact.presentPicker();
+  if (!contact) return null;
+  const name = await contact.getFullName();
+  let phone = null;
+  try {
+    const phones = await contact.getPhones();
+    phone = phones && phones[0] ? phones[0].number : null;
+  } catch (e) {
+  }
   return {
-    id: c.id,
-    name: c.name || [c.firstName, c.lastName].filter(Boolean).join(' '),
-    phone: c.phoneNumbers && c.phoneNumbers[0] ? c.phoneNumbers[0].number : null,
+    id: contact.id,
+    name: name || 'Contacto sin nombre',
+    phone,
   };
 };
 

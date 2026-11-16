@@ -1,7 +1,7 @@
 import { Alert } from 'react-native';
 import * as Location from 'expo-location';
 import { ensureLocationPermission, normalizeStatus } from '../services/permissions';
-import { getCurrentLocation } from '../services/device';
+import { getCurrentLocation, pickContact, createPurchaseEvent } from '../services/device';
 
 describe('permisos', () => {
   beforeEach(() => jest.spyOn(Alert, 'alert').mockImplementation(() => {}));
@@ -24,5 +24,15 @@ describe('permisos', () => {
     Location.requestForegroundPermissionsAsync.mockResolvedValueOnce({ status: 'denied' });
     expect(await ensureLocationPermission()).toBe(false);
     expect(Alert.alert).toHaveBeenCalledWith('Permiso denegado', expect.any(String), expect.any(Array));
+  });
+
+  it('selecciona un contacto con la API nueva de expo-contacts', async () => {
+    const contact = await pickContact();
+    expect(contact).toEqual({ id: '1', name: 'Juan Perez', phone: '1122334455' });
+  });
+
+  it('crea un evento en calendario con expo-calendar/legacy', async () => {
+    const eventId = await createPurchaseEvent('Café');
+    expect(eventId).toBe('event-1');
   });
 });
