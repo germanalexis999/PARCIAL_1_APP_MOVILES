@@ -43,13 +43,17 @@ const CreateProductScreen = ({ navigation }) => {
   const [location, setLocation] = useState(null);
   const [contact, setContact] = useState(null);
   const [addToCalendar, setAddToCalendar] = useState(false);
+  const [busyAction, setBusyAction] = useState(null);
 
-  const run = async (fn, setter) => {
+  const run = async (action, fn, setter) => {
     try {
+      setBusyAction(action);
       const value = await fn();
       if (value) setter(value);
     } catch (e) {
       Alert.alert('Error', 'No se pudo completar la acción: ' + e.message);
+    } finally {
+      setBusyAction(null);
     }
   };
 
@@ -210,31 +214,67 @@ const CreateProductScreen = ({ navigation }) => {
             <Text style={styles.label}>Foto del producto</Text>
             {imageUri ? <Image source={{ uri: imageUri }} style={styles.preview} testID="product-image-preview" /> : null}
             <View style={styles.row}>
-              <CustomButton title="Cámara" variant="outline" onPress={() => run(takePhoto, setImageUri)} style={styles.flexHalf} testID="camera-button" />
+              <CustomButton
+                title="Cámara"
+                variant="outline"
+                loading={busyAction === 'camera'}
+                disabled={busyAction !== null && busyAction !== 'camera'}
+                onPress={() => run('camera', takePhoto, setImageUri)}
+                style={styles.flexHalf}
+                testID="camera-button"
+              />
               <View style={{ width: 8 }} />
-              <CustomButton title="Galería" variant="outline" onPress={() => run(pickFromGallery, setImageUri)} style={styles.flexHalf} testID="gallery-button" />
+              <CustomButton
+                title="Galería"
+                variant="outline"
+                loading={busyAction === 'gallery'}
+                disabled={busyAction !== null && busyAction !== 'gallery'}
+                onPress={() => run('gallery', pickFromGallery, setImageUri)}
+                style={styles.flexHalf}
+                testID="gallery-button"
+              />
             </View>
           </View>
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Comercio (ubicación)</Text>
             {location ? (
-              <Text style={styles.infoText} testID="location-text">
-                {location.address ? location.address + ' · ' : ''}
-                {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}
-              </Text>
+              <View style={styles.successBox}>
+                <Text style={styles.successTitle}>Ubicación registrada</Text>
+                <Text style={styles.successText} testID="location-text">
+                  {location.address ? location.address + ' · ' : ''}
+                  {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}
+                </Text>
+              </View>
             ) : null}
-            <CustomButton title="Usar mi ubicación actual" variant="outline" onPress={() => run(getCurrentLocation, setLocation)} testID="location-button" />
+            <CustomButton
+              title={location ? 'Actualizar ubicación' : 'Usar mi ubicación actual'}
+              variant="outline"
+              loading={busyAction === 'location'}
+              disabled={busyAction !== null && busyAction !== 'location'}
+              onPress={() => run('location', getCurrentLocation, setLocation)}
+              testID="location-button"
+            />
           </View>
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Proveedor (contacto)</Text>
             {contact ? (
-              <Text style={styles.infoText} testID="contact-text">
-                {contact.name}{contact.phone ? ' · ' + contact.phone : ''}
-              </Text>
+              <View style={styles.successBox}>
+                <Text style={styles.successTitle}>Proveedor seleccionado</Text>
+                <Text style={styles.successText} testID="contact-text">
+                  {contact.name}{contact.phone ? ' · ' + contact.phone : ''}
+                </Text>
+              </View>
             ) : null}
-            <CustomButton title="Elegir contacto" variant="outline" onPress={() => run(pickContact, setContact)} testID="contact-button" />
+            <CustomButton
+              title={contact ? 'Cambiar contacto' : 'Elegir contacto'}
+              variant="outline"
+              loading={busyAction === 'contact'}
+              disabled={busyAction !== null && busyAction !== 'contact'}
+              onPress={() => run('contact', pickContact, setContact)}
+              testID="contact-button"
+            />
           </View>
 
           <View style={styles.reminderCard}>
@@ -416,10 +456,24 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 8,
   },
-  infoText: {
+  successBox: {
+    backgroundColor: '#ECFDF5',
+    borderWidth: 1,
+    borderColor: '#A7F3D0',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 8,
+  },
+  successTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#047857',
+    marginBottom: 2,
+  },
+  successText: {
     fontSize: 13,
-    color: '#475569',
-    marginBottom: 6,
+    color: '#065F46',
+    fontWeight: '500',
   },
   saveButton: {
     marginTop: 4,
