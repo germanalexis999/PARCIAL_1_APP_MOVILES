@@ -102,4 +102,4 @@ npm test
 ---
 
 ## Video DEMO
-- **Enlace al video:** https://drive.google.com/file/d/1A68AdnhrkIZ88Mia2nlzrJaw_JKm8-Md/view?usp=drive_link
+- **Enlace al video:** https://docs.google.com/videos/d/1zJFys56xW-OtOFpGGC606K7nuzLxP3foOlZrXA2imUo/play?usp=sharing
