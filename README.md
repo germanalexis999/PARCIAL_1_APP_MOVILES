@@ -30,7 +30,7 @@ Aplicación móvil desarrollada en **React Native** y **Expo** para la gestión 
 > **Nota:** Algunas integraciones nativas (como Contactos y Calendario) requieren probarse en un dispositivo físico o emulador nativo; no funcionan en la versión Web.
 
 ### 4. Testing Automatizado (`Jest` + React Native Testing Library)
-- **5 suites / 13 tests ejecutables con `npm test`** (con mocks de módulos nativos en `jest.setup.js`):
+- **5 suites / 15 tests ejecutables con `npm test`** (con mocks de módulos nativos en `jest.setup.js`):
   - `calculations.test.js`: cálculo del costo total y validaciones.
   - `CustomButton.test.js`: renderizado y eventos de pulsación.
   - `ProductItem.test.js`: renderizado de datos del producto e invocación de `onDelete`.
@@ -102,4 +102,4 @@ npm test
 ---
 
 ## Video DEMO
-- **YouTube (máx. 1 minuto):** _(pegar enlace de YouTube aquí)_
+- **Enlace al video:** https://drive.google.com/file/d/1A68AdnhrkIZ88Mia2nlzrJaw_JKm8-Md/view?usp=drive_link
