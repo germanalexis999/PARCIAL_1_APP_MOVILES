@@ -101,5 +101,29 @@ npm test
 
 ---
 
+## Punto Extra: IA Aplicada al Desarrollo
+
+### Herramientas Utilizadas
+- **Argon Orchestrator:** planificación de arquitectura, análisis de requerimientos del parcial, diseño de la migración hacia estado global y delegación modular de tareas entre componentes, servicios y pruebas.
+- **Hydrogen:** generación asistida, refactorización de pantallas/servicios en React Native + Expo y redacción de pruebas unitarias con Jest y React Native Testing Library.
+
+### Ejemplos de Prompts Aplicados
+Los prompts se estructuraron especificando **contexto**, **objetivo técnico** y **restricciones** para obtener código integrable sin romper la base del Parcial 1:
+
+1. **Arquitectura y migración de estado (Argon Orchestrator → Hydrogen):**
+   > *"Contexto: App de lista de compras en React Native/Expo con persistencia en `AsyncStorage` y estado local en `HomeScreen` y `AppNavigator`. Objetivo: diseñar e implementar `useProductStore` y `useAuthStore` con Zustand (`loadProducts`, `addProduct`, `updateProduct`, `removeProduct`). Restricciones: mantener compatibilidad con productos previos sin campos opcionales (`imageUri`, `location`, `contact`, `calendarEventId`) y evitar prop drilling."*
+2. **Permisos e integración de hardware/APIs nativas:**
+   > *"Contexto: Proyecto en Expo SDK 58 ejecutándose en Expo Go. Objetivo: centralizar la verificación y solicitud de permisos (`granted`, `denied`, `undetermined`) en `src/services/permissions.js` y encapsular cámara, galería, ubicación, contactos y calendario en `src/services/device.js`. Restricciones: mostrar alerta clara con acceso a `Linking.openSettings()` al denegar permisos y no bloquear la carga de productos si una acción opcional se cancela."*
+
+### Comparación: Código Generado vs. Código Final Integrado
+| Aspecto | Código generado inicialmente | Ajustes integrados en la versión final |
+|---|---|---|
+| **APIs de Expo SDK 58** | Uso de métodos legacy (`Contacts.presentContactPickerAsync` y `expo-calendar` estándar). | Migración de contactos a la API orientada a clases (`Contacts.Contact.presentPicker()`, `getFullName()`, `getPhones()`) y uso de `expo-calendar/legacy` para mantener compatibilidad real en Expo Go. |
+| **Feedback de UI** | Botones simples sin indicador de progreso y texto plano de resultado en `CreateProductScreen.js`. | Se incorporó control de estado `busyAction` (spinner y bloqueo de doble toque durante lecturas de GPS/cámara/contactos) y tarjetas de confirmación visual (`successBox`). |
+| **Compatibilidad de sesión** | Reemplazo directo de `AuthContext` que obligaba a modificar la firma de todas las pantallas. | Se conservó `src/context/AuthContext.js` como adaptador liviano conectado a `useAuthStore` para preservar la compatibilidad con tests y pantallas del Parcial 1. |
+| **Testing en Jest** | Mocks básicos individuales por librería. | Unificación de mocks nativos en `jest.setup.js` (renombrando a `mockCalendar` por reglas de hoisting de Babel/Jest) y cobertura ampliada a **5 suites / 15 tests**. |
+
+---
+
 ## Video DEMO
 - **Enlace al video:** https://docs.google.com/videos/d/1zJFys56xW-OtOFpGGC606K7nuzLxP3foOlZrXA2imUo/play?usp=sharing
